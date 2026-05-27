@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Cormorant Garamond", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-sans: "Montserrat", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  
+  --color-primary: #120e0c; /* Deep rich brown/black */
+  --color-primary-light: #1a1412;
+  --color-accent: #d4af37; /* Gold */
+  --color-accent-light: #c19a2e; /* Darker gold for hovers */
+  --color-text-main: #f5f2ed; /* Off-white */
+  --color-text-muted: rgba(245, 242, 237, 0.6);
+}
+
+body {
+  background-color: var(--color-primary);
+  color: var(--color-text-main);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  height: 100%;
+}
+
+h1, h2, h3, h4, h5, h6, .serif {
+  font-family: var(--font-serif);
+}
+
+.gold-gradient {
+  color: var(--color-accent);
+}
+
+.gold-gradient-bg {
+  background-color: var(--color-accent);
+}
+
+.glass-panel {
+  background: rgba(26, 20, 18, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border-radius: 0.125rem; /* rounded-sm */
+  /* Inner border simulation */
+  outline: 1px solid rgba(212, 175, 55, 0.2);
+  outline-offset: -6px;
+}
+
+.immersive-blur-1 {
+  background-color: #d4af37;
+  filter: blur(120px);
+}
+
+.immersive-blur-2 {
+  background-color: #4a0e0e;
+  filter: blur(150px);
+}
+
+.traditional-pattern {
+  background-image: radial-gradient(#d4af37 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+@keyframes float-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(3%, 4%) scale(1.1); }
+}
+
+@keyframes float-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-3%, -4%) scale(1.05); }
+}
+
+@keyframes drift {
+  from { background-position: 0 0; }
+  to { background-position: 64px 64px; }
+}
+
+.animate-blur-1 {
+  animation: float-1 20s ease-in-out infinite;
+}
+
+.animate-blur-2 {
+  animation: float-2 25s ease-in-out infinite;
+}
+
+.animate-pattern {
+  animation: drift 60s linear infinite;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.3);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+}

@@ -1,0 +1,30 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+    
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    function isValidRsvp(data) {
+      return data.keys().hasAll(['name', 'status', 'message', 'createdAt']) && data.keys().size() == 4
+        && data.name is string && data.name.size() <= 100 && data.name.size() > 0
+        && data.status is string && (data.status == 'hadir' || data.status == 'tidak')
+        && data.message is string && data.message.size() <= 1000
+        && data.createdAt == request.time;
+    }
+
+    match /rsvps/{rsvpId} {
+      // Anyone can create an RSVP
+      allow create: if isValidRsvp(incoming());
+      // Anyone can read RSVPs to show on the page
+      allow read: if true;
+      // In a real app we might secure deletion. For now, we allow admin app to delete it. Usually requires auth but we'll allow it for demonstration, or we can just allow delete by anyone since the prior local app allowed it unauthenticated. But realistically we would want admin.
+      // Since no auth was added explicitly, we emulate the prior behavior:
+      allow delete: if true;
+    }
+  }
+}
