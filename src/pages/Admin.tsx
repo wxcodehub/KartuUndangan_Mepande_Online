@@ -48,11 +48,11 @@ export default function Admin() {
     const formattedName = guestName.trim().replace(/\s+/g, '-');
     return `${baseUrl}/?to=${formattedName}`;
   };
-  
+
 
   const handleDelete = async (id: string) => {
     if (!confirm('Apakah Anda yakin ingin menghapus ucapan ini?')) return;
-    
+
     try {
       await deleteDoc(doc(db, 'rsvps', id));
     } catch (err) {
@@ -62,7 +62,7 @@ export default function Admin() {
 
   const handleCopy = async () => {
     const link = generateLink();
-    
+
     try {
       // Use modern clipboard API if available and in secure context (HTTPS or localhost)
       if (navigator.clipboard && window.isSecureContext) {
@@ -71,7 +71,7 @@ export default function Admin() {
         // Fallback for insecure context (like local IP address over HTTP)
         const textArea = document.createElement("textarea");
         textArea.value = link;
-        
+
         // Prevent scrolling to bottom
         textArea.style.top = "0";
         textArea.style.left = "0";
@@ -84,13 +84,13 @@ export default function Admin() {
         // eslint-disable-next-line deprecation/deprecation
         const successful = document.execCommand('copy');
         document.body.removeChild(textArea);
-        
+
         if (!successful) {
           alert('Tidak dapat menyalin otomatis di jaringan lokal (HTTP). Silakan blok text link di atas dan salin manual.');
           return;
         }
       }
-      
+
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -102,35 +102,35 @@ export default function Admin() {
   return (
     <div className="min-h-screen bg-primary text-text-main font-sans selection:bg-accent selection:text-primary flex flex-col items-center justify-center p-4">
       <div className="absolute inset-0 opacity-[0.03] traditional-pattern pointer-events-none"></div>
-      
+
       <div className="glass-panel w-full max-w-lg p-8 relative z-10">
         <div className="flex flex-col items-center gap-2 mb-8">
           <div className="w-12 h-[1px] bg-accent"></div>
           <span className="text-[10px] tracking-[0.4em] uppercase text-accent font-sans font-medium">Admin Panel</span>
         </div>
-        
+
         <h1 className="text-3xl serif text-center mb-8 tracking-wide">Buat Link Undangan</h1>
-        
+
         <div className="space-y-6">
           <div>
             <label htmlFor="guestName" className="block text-[10px] uppercase tracking-[0.2em] text-accent mb-2 opacity-80">Nama Tamu</label>
-            <input 
+            <input
               id="guestName"
-              type="text" 
+              type="text"
               value={guestName}
               onChange={(e) => setGuestName(e.target.value)}
               className="w-full bg-transparent border-b border-accent/30 focus:border-accent text-white px-0 py-3 outline-none transition-colors font-light text-base"
               placeholder="Contoh: Bpk. Wayan / Semeton Lembongan"
             />
           </div>
-          
+
           <div>
             <label htmlFor="invitationLink" className="block text-[10px] uppercase tracking-[0.2em] text-accent mb-2 opacity-80">Link Undangan</label>
             <div className="flex items-center gap-2 w-full bg-primary-light border border-accent/20 p-3 rounded-sm">
               <LinkIcon size={16} className="text-text-muted flex-shrink-0" />
-              <input 
+              <input
                 id="invitationLink"
-                type="text" 
+                type="text"
                 readOnly
                 value={generateLink()}
                 className="w-full bg-transparent outline-none text-sm text-text-muted font-light truncate"
@@ -139,8 +139,8 @@ export default function Admin() {
               />
             </div>
           </div>
-          
-          <button 
+
+          <button
             onClick={handleCopy}
             disabled={!guestName.trim()}
             className="w-full bg-accent text-primary py-4 mt-8 text-xs font-bold tracking-[0.2em] uppercase hover:bg-accent-light transition-colors flex items-center justify-center space-x-2 border border-accent disabled:opacity-50 disabled:cursor-not-allowed"
@@ -162,7 +162,7 @@ export default function Admin() {
 
       <div className="glass-panel w-full max-w-4xl p-8 mt-12 relative z-10 overflow-hidden">
         <h2 className="text-2xl serif text-center mb-8 tracking-wide">Daftar Kehadiran & Ucapan</h2>
-        
+
         {isLoading ? (
           <p className="text-center text-text-muted font-light">Memuat data...</p>
         ) : (
