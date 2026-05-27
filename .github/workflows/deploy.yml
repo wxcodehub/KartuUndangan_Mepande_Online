@@ -34,3 +34,5 @@ jobs:
         REMOTE_USER: ${{ secrets.VPS_USERNAME }}
         SOURCE: "dist/"
         TARGET: "/www/wwwroot/wxinvitation.biz.id"
+        EXCLUDE: "/.user.ini"
+        
