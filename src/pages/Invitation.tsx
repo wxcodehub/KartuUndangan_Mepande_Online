@@ -464,18 +464,18 @@ export default function Invitation() {
                 <div className="flex flex-wrap items-center justify-center gap-8 max-w-lg mx-auto">
                   {/* Sponsor 1 - hyCorp (Transparent) */}
                   <div className="flex items-center justify-center transition-all duration-300 hover:scale-105 cursor-pointer h-15">
-                    <img 
-                      src="/sponsor_hycorp.png" 
-                      alt="hyCorp Logo" 
+                    <img
+                      src="/sponsor_hycorp.png"
+                      alt="hyCorp Logo"
                       className="h-full object-contain brightness-50 hover:brightness-100 transition-all duration-300"
                     />
                   </div>
-                  
+
                   {/* Sponsor 2 - Wx Host (Transparent) */}
                   <div className="flex items-center justify-center transition-all duration-300 hover:scale-105 cursor-pointer h-15">
-                    <img 
-                      src="/sponsor_wxhost.png" 
-                      alt="Wx Host Logo" 
+                    <img
+                      src="/sponsor_wxhost.png"
+                      alt="Wx Host Logo"
                       className="h-full object-contain brightness-50 hover:brightness-100 transition-all duration-300"
                     />
                   </div>
@@ -489,7 +489,7 @@ export default function Invitation() {
       {/* Audio Element: Ganti URL di src= dengan link musik MP3 Anda */}
       <audio
         ref={audioRef}
-        src="/Musik.mp3"
+        src="/musik.mp3"
         loop
         preload="auto"
         title="Musik Latar Belakang"
