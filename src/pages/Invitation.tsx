@@ -331,7 +331,7 @@ export default function Invitation() {
 
                       <div className="flex flex-col items-center">
                         <Clock className="text-accent mb-2" size={24} strokeWidth={1.5} />
-                        <p className="font-sans font-medium tracking-wide text-sm opacity-90">16:00 WITA - Selesai</p>
+                        <p className="font-sans font-medium tracking-wide text-sm opacity-90">14:00 WITA - Selesai</p>
                       </div>
 
                       <div className="w-16 h-[1px] bg-accent/20 mx-auto my-4" />
