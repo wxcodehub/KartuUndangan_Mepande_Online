@@ -106,7 +106,7 @@ const WelcomeCover = ({ onOpen, guestName }: { onOpen: () => void, guestName: st
 
         <div className="w-16 h-[1px] bg-accent/20 mt-8 mb-10" />
 
-        <p className="text-[10px] text-text-muted mb-3 uppercase tracking-[0.2em]">Kepada Yth. Bapak/Ibu/Saudara</p>
+        <p className="text-[10px] text-text-muted mb-3 uppercase tracking-[0.2em]">Kepada Yth. Bapak/Ibu/Saudara/I</p>
         <h2 className="text-2xl serif text-text-main mb-10 font-medium tracking-wide">{guestName}</h2>
 
         <button
@@ -150,11 +150,132 @@ const CandidateCard = ({ name, parents, index }: { name: string, parents: string
   </motion.div>
 );
 
+const TARGET_DATE = new Date('2026-06-11T14:00:00+08:00'); // 14:00 WITA
+const END_DATE = new Date('2026-06-11T18:00:00+08:00'); // 18:00 WITA
+
+const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent("Upacara Mepandes Dek Evam")}&dates=20260611T060000Z/20260611T100000Z&details=${encodeURIComponent("Menghadiri Upacara Nyurud Ayu Mepandes/Potong gigi putra kami I Kadek Evam Wira Sanjaya. Mohon doa restu Anda.")}&location=${encodeURIComponent("Banjar Kaja Desa Lembongan, Nusa Penida, Klungkung, Bali")}`;
+
+function getEventStatus() {
+  const now = new Date();
+  if (now < TARGET_DATE) return 'upcoming';
+  if (now < END_DATE) return 'ongoing';
+  return 'past';
+}
+
+const CountdownTimer = ({ status }: { status: 'upcoming' | 'ongoing' | 'past' }) => {
+  const [timeLeft, setTimeLeft] = useState<{
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+  } | null>(null);
+
+  useEffect(() => {
+    if (status !== 'upcoming') return;
+
+    const calculateDifference = () => {
+      const now = new Date();
+      const diff = TARGET_DATE.getTime() - now.getTime();
+      if (diff <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+      return {
+        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((diff / 1000 / 60) % 60),
+        seconds: Math.floor((diff / 1000) % 60),
+      };
+    };
+
+    setTimeLeft(calculateDifference());
+
+    const timer = setInterval(() => {
+      setTimeLeft(calculateDifference());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [status]);
+
+  if (status === 'ongoing') {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        className="glass-panel text-center max-w-md mx-auto mb-12"
+      >
+        <div className="border border-accent/20 p-6 relative overflow-hidden">
+          <div className="absolute inset-0 bg-accent/5 pointer-events-none" />
+          <motion.div
+            animate={{ opacity: [0.4, 0.8, 0.4] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="text-accent font-semibold tracking-[0.2em] text-[10px] uppercase mb-2"
+          >
+            ● Sedang Berlangsung
+          </motion.div>
+          <p className="serif text-base text-text-main italic px-2">
+            Acara Sedang Berlangsung. Mohon doa restu agar upacara berjalan lancar.
+          </p>
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (status === 'past') {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        className="glass-panel text-center max-w-md mx-auto mb-12"
+      >
+        <div className="border border-accent/20 p-6 relative overflow-hidden">
+          <div className="text-accent font-semibold tracking-[0.2em] text-[10px] uppercase mb-2">
+            Acara Telah Selesai
+          </div>
+          <p className="serif text-base text-text-main italic px-2">
+            Acara Telah Berlangsung. Terima kasih yang mendalam atas kehadiran dan doa restu Bapak/Ibu/Saudara/i.
+          </p>
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (!timeLeft) return null;
+
+  const formatNum = (num: number) => String(num).padStart(2, '0');
+
+  const timeItems = [
+    { label: 'Hari', value: timeLeft.days },
+    { label: 'Jam', value: timeLeft.hours },
+    { label: 'Menit', value: timeLeft.minutes },
+    { label: 'Detik', value: timeLeft.seconds },
+  ];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8 }}
+      className="max-w-md mx-auto mb-12"
+    >
+      <div className="grid grid-cols-4 gap-3 text-center">
+        {timeItems.map((item, index) => (
+          <div key={index} className="glass-panel border border-accent/20 p-3 sm:p-4 rounded-sm flex flex-col items-center justify-center relative overflow-hidden group">
+            <span className="text-2xl sm:text-3xl font-light text-accent tracking-wide">{formatNum(item.value)}</span>
+            <span className="text-[9px] uppercase tracking-[0.15em] text-text-muted mt-1">{item.label}</span>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+};
+
 export default function Invitation() {
   const [isOpened, setIsOpened] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [searchParams] = useSearchParams();
   const audioRef = useRef<HTMLAudioElement>(null);
+  const wasPlayingRef = useRef(false);
 
   // RSVP Form States
   const [name, setName] = useState('');
@@ -163,6 +284,7 @@ export default function Invitation() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [wishes, setWishes] = useState<RSVPData[]>([]);
+  const [eventStatus, setEventStatus] = useState<'upcoming' | 'ongoing' | 'past'>('upcoming');
 
   const rawGuestName = searchParams.get('to');
   const guestName = rawGuestName ? rawGuestName.replace(/-/g, ' ') : 'Tamu Undangan';
@@ -182,16 +304,55 @@ export default function Invitation() {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    setEventStatus(getEventStatus());
+    const interval = setInterval(() => {
+      setEventStatus(getEventStatus());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (guestName && guestName !== 'Tamu Undangan') {
+      document.title = `Undangan Mepandes Dek Evam - Spesial untuk ${guestName}`;
+    } else {
+      document.title = `Undangan Mepandes Dek Evam`;
+    }
+  }, [guestName]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (isPlaying) {
+          wasPlayingRef.current = true;
+          setIsPlaying(false);
+        } else {
+          wasPlayingRef.current = false;
+        }
+      } else {
+        if (wasPlayingRef.current) {
+          setIsPlaying(true);
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isPlaying]);
+
   const handleRSVPSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !status) return;
+    const trimmedName = name.trim();
+    if (!trimmedName || !status || isSubmitting) return;
 
     setIsSubmitting(true);
     try {
       await addDoc(collection(db, 'rsvps'), {
-        name,
+        name: trimmedName,
         status,
-        message,
+        message: message.trim(),
         createdAt: serverTimestamp()
       });
 
@@ -285,7 +446,7 @@ export default function Invitation() {
               <div className="absolute top-4 right-4 w-12 h-12 border-t border-r border-accent/30 pointer-events-none" />
               <div className="absolute bottom-4 left-4 w-12 h-12 border-b border-l border-accent/30 pointer-events-none" />
 
-              <h2 className="text-accent italic text-2xl md:text-3xl serif font-normal mb-8">Om Swastiastu</h2>
+              <h2 className="text-accent text-4xl md:text-5xl lg:text-6xl script font-normal mb-8">Om Swastiastu</h2>
               <p className="serif text-3xl md:text-5xl lg:text-5xl font-light leading-snug mb-8 tracking-tight">
                 “Om Awighnamastu<br /> <span className="italic text-text-muted text-2xl md:text-4xl font-light mt-2 block">Namo Siddham”</span>
               </p>
@@ -313,7 +474,9 @@ export default function Invitation() {
             <div className="max-w-4xl mx-auto">
               <SectionHeading title="Waktu & Tempat" />
 
-              <div className="mt-16 max-w-md mx-auto">
+              <CountdownTimer status={eventStatus} />
+
+              <div className="mt-8 max-w-md mx-auto">
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -343,12 +506,26 @@ export default function Invitation() {
                       </div>
                     </div>
 
-                    <a
-                      href="https://maps.app.goo.gl/A2rry8UpwWQfqYVr9?g_st=ic"
-                      className="inline-block mt-8 border border-accent text-accent px-6 py-2 text-[10px] font-sans uppercase font-bold tracking-[0.2em] hover:bg-accent/10 transition-colors"
-                    >
-                      Buka Peta
-                    </a>
+                    <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8">
+                      <a
+                        href="https://maps.app.goo.gl/A2rry8UpwWQfqYVr9?g_st=ic"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full sm:w-auto text-center border border-accent text-accent px-6 py-2 text-[10px] font-sans uppercase font-bold tracking-[0.2em] hover:bg-accent/10 transition-colors"
+                      >
+                        Buka Peta
+                      </a>
+                      {eventStatus === 'upcoming' && (
+                        <a
+                          href={googleCalendarUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full sm:w-auto text-center bg-accent text-primary px-6 py-2 text-[10px] font-sans uppercase font-bold tracking-[0.2em] hover:bg-accent-light transition-colors border border-accent"
+                        >
+                          Simpan ke Kalender
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </motion.div>
               </div>
@@ -431,8 +608,8 @@ export default function Invitation() {
             <div className="relative z-10 max-w-2xl mx-auto flex flex-col items-center">
               <h2 className="text-4xl md:text-5xl serif mb-6 tracking-tight font-light">Terima Kasih</h2>
               <p className="text-text-muted font-light leading-relaxed mb-12 text-sm opacity-80">
-                Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu.<br /><br />
-                <span className="text-accent italic text-2xl serif font-normal">Om Santih Santih Santih Om</span>
+                Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu.
+                <span className="text-accent text-3xl md:text-4xl script font-normal block mt-6">Om Santih Santih Santih Om</span>
               </p>
 
               <div className="w-16 h-[1px] bg-accent/30 mb-8" />
@@ -440,18 +617,31 @@ export default function Invitation() {
                 Keluarga Bpk. I Wayan Suwira
               </p>
 
-              {/* Marquee Ucapan */}
               {wishes.length > 0 && (
                 <div className="w-full overflow-hidden border-y border-accent/10 py-3 mt-8">
-                  <div className="whitespace-nowrap animate-marquee flex gap-12">
-                    {wishes.filter(w => w.message && w.message.trim() !== '').map((wish, idx) => (
-                      <div key={idx} className="inline-flex items-center gap-2">
-                        <Heart size={10} className="text-accent" />
-                        <span className="text-text-main font-medium italic serif text-lg">{wish.name}</span>
-                        <span className="text-text-muted text-sm mx-2">—</span>
-                        <span className="text-text-muted font-light text-sm">{wish.message}</span>
-                      </div>
-                    ))}
+                  <div className="flex w-max animate-marquee gap-12">
+                    {/* Track 1 */}
+                    <div className="flex gap-12 shrink-0">
+                      {wishes.filter(w => w.message && w.message.trim() !== '').map((wish, idx) => (
+                        <div key={`track1-${wish.id || idx}`} className="inline-flex items-center gap-2">
+                          <Heart size={10} className="text-accent" />
+                          <span className="text-text-main font-medium italic serif text-lg">{wish.name}</span>
+                          <span className="text-text-muted text-sm mx-2">—</span>
+                          <span className="text-text-muted font-light text-sm">{wish.message}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Track 2 (Duplicate for seamless loop) */}
+                    <div className="flex gap-12 shrink-0" aria-hidden="true">
+                      {wishes.filter(w => w.message && w.message.trim() !== '').map((wish, idx) => (
+                        <div key={`track2-${wish.id || idx}`} className="inline-flex items-center gap-2">
+                          <Heart size={10} className="text-accent" />
+                          <span className="text-text-main font-medium italic serif text-lg">{wish.name}</span>
+                          <span className="text-text-muted text-sm mx-2">—</span>
+                          <span className="text-text-muted font-light text-sm">{wish.message}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
